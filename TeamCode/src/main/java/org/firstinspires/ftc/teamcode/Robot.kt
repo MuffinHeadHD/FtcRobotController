@@ -24,7 +24,7 @@ class Robot(opMode: OpMode) {
     var lb: DcMotor
     var rf: DcMotor
     var rb: DcMotor
-    var motors: Array<DcMotor>
+    var driveMotors: Array<DcMotor>
 
     var flywheelMotor: DcMotorEx
     var intakeServo: CRServo
@@ -58,9 +58,9 @@ class Robot(opMode: OpMode) {
         lb = hardwareMap.get(DcMotor::class.java, "lb")
         rf = hardwareMap.get(DcMotor::class.java, "rf")
         rb = hardwareMap.get(DcMotor::class.java, "rb")
-        motors = arrayOf(lf, lb, rf, rb)
+        driveMotors = arrayOf(lf, lb, rf, rb)
 
-        for (motor in motors) {
+        for (motor in driveMotors) {
             motor.power = 0.0
             motor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
             motor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
