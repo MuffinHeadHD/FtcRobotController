@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.slew
 import kotlin.math.abs
 import kotlin.math.tan
 
-class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelMotor: DcMotorEx) {
+class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelMotor: DcMotorEx): Updatable {
     private var lastTxDeg = 0.0
     private var lastTyDeg = 0.0
     private var lastSeenTimeMs = System.currentTimeMillis()
@@ -41,7 +41,7 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
 
     var lastTime = System.nanoTime()
 
-    fun update() {
+    override fun update() {
         val now = System.nanoTime()
         val dt = (now - lastTime) / 1e9
         lastTime = now

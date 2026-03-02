@@ -103,7 +103,7 @@ class Robot(opMode: OpMode) {
         turret = Turret(limelight, turretMotor, flywheelMotor)
         spindexer = Spindexer(spindexerServo, spindexerDistance, spindexerColor, spindexerLight, spindexerMagnet)
 
-        updateables = arrayOf(spindexerServo, spindexerLight, spindexer)
+        updateables = arrayOf(spindexerServo, spindexerLight, spindexer, turret)
     }
 
     fun update() {
