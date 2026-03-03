@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode
 
+import com.acmerobotics.dashboard.FtcDashboard
 import com.qualcomm.hardware.limelightvision.Limelight3A
 import com.qualcomm.robotcore.eventloop.opmode.OpMode
 import com.qualcomm.robotcore.hardware.AnalogInput
@@ -12,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.hardware.TouchSensor
+import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.parts.AxonServo
 import org.firstinspires.ftc.teamcode.parts.Drive
 import org.firstinspires.ftc.teamcode.parts.Intake
@@ -19,8 +21,9 @@ import org.firstinspires.ftc.teamcode.parts.Light
 import org.firstinspires.ftc.teamcode.parts.Spindexer
 import org.firstinspires.ftc.teamcode.parts.Turret
 import org.firstinspires.ftc.teamcode.parts.Updatable
+import org.firstinspires.ftc.teamcode.util.GamepadState
 
-class Robot(opMode: OpMode) {
+class Robot(val opMode: OpMode) {
     var lf: DcMotor
     var lb: DcMotor
     var rf: DcMotor
@@ -48,6 +51,12 @@ class Robot(opMode: OpMode) {
     var spindexer: Spindexer
 
     var updateables: Array<Updatable>
+
+    var dashboard: FtcDashboard = FtcDashboard.getInstance()
+    var dashboardTelemetry: Telemetry = dashboard.telemetry
+
+    var gamepadState1: GamepadState
+    var gamepadState2: GamepadState
 
     init {
         val hardwareMap: HardwareMap = opMode.hardwareMap
@@ -104,9 +113,17 @@ class Robot(opMode: OpMode) {
         spindexer = Spindexer(spindexerServo, spindexerDistance, spindexerColor, spindexerLight, spindexerMagnet)
 
         updateables = arrayOf(spindexerServo, spindexerLight)
+
+        gamepadState1 = GamepadState()
+        gamepadState2 = GamepadState()
     }
 
     fun update() {
         updateables.forEach { it.update() }
+    }
+
+    fun updateGamepadStates() {
+        gamepadState1.updateGamepadState(opMode.gamepad1)
+        gamepadState2.updateGamepadState(opMode.gamepad2)
     }
 }
