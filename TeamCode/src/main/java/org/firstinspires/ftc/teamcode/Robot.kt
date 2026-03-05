@@ -56,7 +56,9 @@ class Robot(val opMode: OpMode) {
     var dashboardTelemetry: Telemetry = dashboard.telemetry
 
     var gamepadState1: GamepadState
+    var lastGamepadState1: GamepadState
     var gamepadState2: GamepadState
+    var lastGamepadState2: GamepadState
 
     init {
         val hardwareMap: HardwareMap = opMode.hardwareMap
@@ -112,18 +114,25 @@ class Robot(val opMode: OpMode) {
         turret = Turret(limelight, turretMotor, flywheelMotor)
         spindexer = Spindexer(spindexerServo, spindexerDistance, spindexerColor, spindexerLight, spindexerMagnet)
 
-        updateables = arrayOf(spindexerServo, spindexerLight)
+        updateables = arrayOf(spindexer)
 
         gamepadState1 = GamepadState()
+        lastGamepadState1 = GamepadState()
         gamepadState2 = GamepadState()
+        lastGamepadState2 = GamepadState()
     }
 
     fun update() {
         updateables.forEach { it.update() }
     }
 
-    fun updateGamepadStates() {
-        gamepadState1.updateGamepadState(opMode.gamepad1)
-        gamepadState2.updateGamepadState(opMode.gamepad2)
+    fun updateGamepadStates(last: Boolean) {
+        if (last) {
+            lastGamepadState1.updateGamepadState(gamepadState1)
+            lastGamepadState2.updateGamepadState(gamepadState2)
+        } else {
+            gamepadState1.updateGamepadState(opMode.gamepad1)
+            gamepadState2.updateGamepadState(opMode.gamepad2)
+        }
     }
 }
