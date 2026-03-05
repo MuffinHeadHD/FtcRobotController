@@ -41,7 +41,7 @@ class Spindexer(val servo: AxonServo, val distanceSensor: DistanceSensor, val co
     private val outAlpha: Int = 18
     private var hueFilt = 0f
 
-    private var homePosition: Double = 0.0
+    private var homePosition: Double = 0.7554545454545455
 
     override fun update() {
         servo.pid.kp = SpindexerPID.kp
@@ -89,7 +89,7 @@ class Spindexer(val servo: AxonServo, val distanceSensor: DistanceSensor, val co
     }
 
     fun home() {
-        servo.targetPosition = 0.55
+        servo.targetPosition = homePosition
     }
 
     fun setLightColor(color: LightColor) {
