@@ -11,30 +11,28 @@ class SpindexerTest: LinearOpMode() {
     override fun runOpMode() {
         robot = Robot(this)
 
-//        robot.spindexer.home()
-
         waitForStart()
 
-        while (opModeIsActive()) {
-            robot.update()
+        robot.spindexer.home()
 
-            if (gamepad1.left_bumper && !robot.gamepadState1.left_bumper) {
+        while (opModeIsActive()) {
+            robot.updateGamepadStates(false)
+
+            if (robot.gamepadState1.a && !robot.lastGamepadState1.a) {
                 robot.spindexer.rotate(1)
+            } else if (robot.gamepadState1.b && !robot.lastGamepadState1.b) {
+                robot.spindexer.rotate(-1)
             }
 
-            robot.updateGamepadStates()
+            robot.update()
 
-            robot.dashboardTelemetry.addData("servo power", robot.spindexer.servo.servo.power)
-            robot.dashboardTelemetry.addData("servo target", robot.spindexer.servo.targetPosition)
-            robot.dashboardTelemetry.addData("servo current", robot.spindexer.servo.position)
-            robot.dashboardTelemetry.addData("servo analog", robot.spindexer.servo.analog.voltage)
+            robot.dashboardTelemetry.addData("Current", robot.spindexer.servo.position)
+            robot.dashboardTelemetry.addData("Target", robot.spindexer.servo.targetPosition)
+            robot.dashboardTelemetry.addData("Error", robot.spindexer.servo.targetPosition - robot.spindexer.servo.position)
+            robot.dashboardTelemetry.addData("Power", robot.spindexer.servo.servo.power)
             robot.dashboardTelemetry.update()
 
-            telemetry.addData("servo power", robot.spindexer.servo.servo.power)
-            telemetry.addData("servo target", robot.spindexer.servo.targetPosition)
-            telemetry.addData("servo current", robot.spindexer.servo.position)
-            telemetry.addData("servo analog", robot.spindexer.servo.analog.voltage)
-            telemetry.update()
+            robot.updateGamepadStates(true)
         }
     }
 }
