@@ -23,7 +23,7 @@ class BasicTest : LinearOpMode() {
             robot.updateGamepadStates(false)
             robot.drive.drive(robot.gamepadState1.left_stick_x.toDouble(), -robot.gamepadState1.left_stick_y.toDouble(), robot.gamepadState1.right_stick_x.toDouble())
 
-            val intakeMode: IntakeMode = if (robot.gamepadState2.b) IntakeMode.OUT else if (robot.gamepadState2.y) IntakeMode.IN else IntakeMode.OFF
+            val intakeMode: IntakeMode = if (robot.gamepadState2.b) IntakeMode.IN else if (robot.gamepadState2.y) IntakeMode.OUT else IntakeMode.OFF
             robot.intake.set(intakeMode)
 
             if (robot.gamepadState2.left_bumper && !robot.lastGamepadState2.left_bumper) {
