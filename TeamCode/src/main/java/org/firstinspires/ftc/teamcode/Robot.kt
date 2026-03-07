@@ -24,41 +24,41 @@ import org.firstinspires.ftc.teamcode.parts.Updatable
 import org.firstinspires.ftc.teamcode.util.GamepadState
 
 open class Robot(val opMode: OpMode) {
-    var lf: DcMotor
-    var lb: DcMotor
-    var rf: DcMotor
-    var rb: DcMotor
-    var driveMotors: Array<DcMotor>
+    lateinit var lf: DcMotor
+    lateinit var lb: DcMotor
+    lateinit var rf: DcMotor
+    lateinit var rb: DcMotor
+    lateinit var driveMotors: Array<DcMotor>
 
-    var flywheelMotor: DcMotorEx
-    var intakeServo: CRServo
-    var spindexerServo: AxonServo
-    var spindexerColor: ColorSensor
-    var spindexerDistance: DistanceSensor
-    var spindexerMagnet: TouchSensor
+    lateinit var flywheelMotor: DcMotorEx
+    lateinit var intakeServo: CRServo
+    lateinit var spindexerServo: AxonServo
+    lateinit var spindexerColor: ColorSensor
+    lateinit var spindexerDistance: DistanceSensor
+    lateinit var spindexerMagnet: TouchSensor
 
-    var turretMotor: DcMotor
-    var limelight: Limelight3A
+    lateinit var turretMotor: DcMotor
+    lateinit var limelight: Limelight3A
 
-    var leftLiftServo: CRServo
-    var rightLiftServo: CRServo
+    lateinit var leftLiftServo: CRServo
+    lateinit var rightLiftServo: CRServo
 
-    var spindexerLight: Light
+    lateinit var spindexerLight: Light
 
-    var drive: Drive
-    var intake: Intake
-    var turret: Turret
-    var spindexer: Spindexer
+    lateinit var drive: Drive
+    lateinit var intake: Intake
+    lateinit var turret: Turret
+    lateinit var spindexer: Spindexer
 
-    var updateables: Array<Updatable>
+    lateinit var updateables: Array<Updatable>
 
     var dashboard: FtcDashboard = FtcDashboard.getInstance()
     var dashboardTelemetry: Telemetry = dashboard.telemetry
 
-    var gamepadState1: GamepadState
-    var lastGamepadState1: GamepadState
-    var gamepadState2: GamepadState
-    var lastGamepadState2: GamepadState
+    lateinit var gamepadState1: GamepadState
+    lateinit var lastGamepadState1: GamepadState
+    lateinit var gamepadState2: GamepadState
+    lateinit var lastGamepadState2: GamepadState
 
     init {
         val hardwareMap: HardwareMap = opMode.hardwareMap
