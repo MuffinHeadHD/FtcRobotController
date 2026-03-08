@@ -186,7 +186,7 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
         val corr = kP_vel * err
         val out = (ff + corr).coerceIn(0.0, 1.0)
 
-        flyPower = rampTowards(flyPower, out, powerSlewPerSec * dt)
+        flyPower = rampTowards(flyPower, out, powerSlewPerSec * dt) + TurretConfig.flywheelVelocityDelta
         flywheelMotor.power = -flyPower
     }
 }
