@@ -96,7 +96,13 @@ class BasicBlue : LinearOpMode() {
             telemetry.addData("GoalTagSeen", seenGoal)
             telemetry.addData("Goal tx", goal?.targetXDegrees)
             telemetry.addData("Goal ty", goal?.targetYDegrees)
-            telemetry.addData("Limelight Distance", (robot.turret.tagHeightCm - robot.turret.camHeightCm) / tan(robot.turret.limelight.getLatestResult().fiducialResults[0].targetYDegrees))
+            val tag = robot.turret.limelight.getLatestResult().fiducialResults.firstOrNull()
+            if (tag != null) {
+                telemetry.addData(
+                    "Limelight Distance",
+                    (robot.turret.tagHeightCm - robot.turret.camHeightCm) / tan(tag.targetYDegrees)
+                )
+            }
             telemetry.addData("SeenGoalStable", seenGoalStable)
             telemetry.update()
 
