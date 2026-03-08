@@ -37,13 +37,13 @@ class BasicTest_BLUE : LinearOpMode() {
                 robot.turret.home()
             }
 
-//            if (robot.gamepadState1.dpad_up) {
-//                robot.lift.up()
-//            } else if (robot.gamepadState1.dpad_down) {
-//                robot.lift.down()
-//            } else {
-//                robot.lift.stop()
-//            }
+            if (robot.gamepadState1.dpad_up) {
+                robot.lift.up()
+            } else if (robot.gamepadState1.dpad_down) {
+                robot.lift.down()
+            } else {
+                robot.lift.stop()
+            }
 
 
             robot.dashboardTelemetry.addData("Lime Dist", robot.turret.limelight.latestResult.tx)

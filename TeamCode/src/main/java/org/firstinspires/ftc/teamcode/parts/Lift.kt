@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.parts
 
 import com.qualcomm.robotcore.hardware.CRServo
 
-class Lift(val leftLift: CRServo, val rightLift: CRServo) : Updatable {
+class Lift(val leftLift: CRServo, val rightLift: CRServo) {
     private var power = 0.0
 
     fun setPower(p: Double) {
@@ -19,10 +19,5 @@ class Lift(val leftLift: CRServo, val rightLift: CRServo) : Updatable {
 
     fun stop() {
         power = 0.0
-    }
-
-    override fun update() {
-        leftLift.power = power
-        rightLift.power = power
     }
 }
