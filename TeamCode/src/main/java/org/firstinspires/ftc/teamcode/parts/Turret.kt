@@ -15,7 +15,6 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
 
     init {
         turretMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-        turretMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
         turretMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 
@@ -44,10 +43,10 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
     private var targetVelCmd = 2200.0
     private var targetVel = 2200.0
     private val velSlew = 7000.0
-    private val powerSlewPerSec = 3.0
+    private val powerSlewPerSec = 5.0
     private var flyPower = 0.0
     private val maxVelEst = 4000.0
-    private val kP_vel = 0.0002
+    private val kP_vel = 0.0003
 
     private val PIPELINE_INDEX = 2
 
@@ -163,7 +162,7 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
         val distFresh = (nowMs - lastDistSeenMs) <= holdDistMs
 
         val distPts = doubleArrayOf(80.0, 120.0, 160.0, 180.0, 200.0, 320.0)
-        val velPts = doubleArrayOf(1667.0, 1843.6459, 1879.0, 2007.901, 2080.0, 2300.0)
+        val velPts = doubleArrayOf(1667.0, 1843.6459, 1879.0, 2007.901, 2080.0, 2510.0)
 
         if (distFresh) {
             val v = interp1D(distFiltCm, distPts, velPts)
