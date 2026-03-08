@@ -145,7 +145,7 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
                 } else {
                     var pwr = kP_tt * txToUse
                     pwr = if (pwr > 0) pwr + minPower else pwr - minPower
-                    clamp(pwr, -maxPower_tt, maxPower_tt)
+                    clamp(pwr,-maxPower_tt, maxPower_tt)
                 }
 
             turretMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
