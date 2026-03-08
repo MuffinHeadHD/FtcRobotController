@@ -17,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.parts.AxonServo
 import org.firstinspires.ftc.teamcode.parts.Drive
 import org.firstinspires.ftc.teamcode.parts.Intake
+import org.firstinspires.ftc.teamcode.parts.Lift
 import org.firstinspires.ftc.teamcode.parts.Light
 import org.firstinspires.ftc.teamcode.parts.Spindexer
 import org.firstinspires.ftc.teamcode.parts.Turret
@@ -50,6 +51,8 @@ open class Robot(val opMode: OpMode) {
     lateinit var turret: Turret
     lateinit var spindexer: Spindexer
 
+    lateinit var lift: Lift
+
     lateinit var updateables: Array<Updatable>
 
     var dashboard: FtcDashboard = FtcDashboard.getInstance()
@@ -78,7 +81,7 @@ open class Robot(val opMode: OpMode) {
             motor.power = 0.0
             motor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
             motor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
-            motor.mode = DcMotor.RunMode.RUN_USING_ENCODER
+            motor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
         }
 
         lf.direction = Direction.REVERSE
@@ -92,9 +95,12 @@ open class Robot(val opMode: OpMode) {
 
         intakeServo = hardwareMap.get(CRServo::class.java, "intk")
 
-        spindexerServo = AxonServo(hardwareMap.get(CRServo::class.java, "spdx"), hardwareMap.get(AnalogInput::class.java, "axen"))
+        spindexerServo = AxonServo(
+            hardwareMap.get(CRServo::class.java, "spdx"),
+            hardwareMap.get(AnalogInput::class.java, "axen")
+        )
         spindexerColor = hardwareMap.get(ColorSensor::class.java, "css")
-        spindexerDistance = hardwareMap.get(DistanceSensor::class.java, "css")
+        spindexerDistance = hardwareMap.get(DistanceSensor::class.java, "cs")
         spindexerMagnet = hardwareMap.get(TouchSensor::class.java, "mag")
 
         turretMotor = hardwareMap.get(DcMotor::class.java, "tt")
@@ -112,7 +118,13 @@ open class Robot(val opMode: OpMode) {
         drive = Drive(lf, lb, rf, rb)
         intake = Intake(intakeServo)
         turret = Turret(limelight, turretMotor, flywheelMotor)
-        spindexer = Spindexer(spindexerServo, spindexerDistance, spindexerColor, spindexerLight, spindexerMagnet)
+        spindexer = Spindexer(
+            spindexerServo,
+            spindexerDistance,
+            spindexerColor,
+            spindexerLight,
+            spindexerMagnet
+        )
 
         updateables = arrayOf(spindexer, turret)
 

@@ -16,6 +16,10 @@ class Drive(val lf: DcMotor, val lb: DcMotor, val rf: DcMotor, val rb: DcMotor) 
         val dt = (now - lastTime) / 1e9
         lastTime = now
 
+//        val y = -gamepad1.left_stick_y.toDouble()
+//        val x = gamepad1.left_stick_x.toDouble()
+//        val rx = gamepad1.right_stick_x.toDouble()
+
         val denominator = maxOf(abs(y) + abs(x) + abs(rx), 1.0)
 
         val flTarget = (y + x + rx) / denominator
@@ -30,14 +34,14 @@ class Drive(val lf: DcMotor, val lb: DcMotor, val rf: DcMotor, val rb: DcMotor) 
         val frOut = frTarget * drivespeed
         val brOut = brTarget * drivespeed
 
-        flCmd = rampWithBrake(flCmd, flOut, dt)
-        blCmd = rampWithBrake(blCmd, blOut, dt)
-        frCmd = rampWithBrake(frCmd, frOut, dt)
-        brCmd = rampWithBrake(brCmd, brOut, dt)
+//        flCmd = rampWithBrake(flCmd, flOut, dt)
+//        blCmd = rampWithBrake(blCmd, blOut, dt)
+//        frCmd = rampWithBrake(frCmd, frOut, dt)
+//        brCmd = rampWithBrake(brCmd, brOut, dt)
 
-        lf.power = flCmd
-        lb.power = blCmd
-        rf.power = frCmd
-        rb.power = brCmd
+        lf.power = flOut
+        lb.power = blOut
+        rf.power = frOut
+        rb.power = brOut
     }
 }
