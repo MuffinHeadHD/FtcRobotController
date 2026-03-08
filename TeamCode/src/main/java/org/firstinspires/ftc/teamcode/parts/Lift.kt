@@ -3,26 +3,21 @@ package org.firstinspires.ftc.teamcode.parts
 import com.qualcomm.robotcore.hardware.CRServo
 
 class Lift(val leftLift: CRServo, val rightLift: CRServo) {
-    private var power = 0.0
-
     fun setPower(p: Double) {
-        power = p.coerceIn(-1.0, 1.0)
+        val power = p.coerceIn(-1.0, 1.0)
+        leftLift.power = power
+        rightLift.power = power
     }
 
     fun up() {
-        power = 1.0
+        setPower(1.0)
     }
 
     fun down() {
-        power = -1.0
+        setPower(-1.0)
     }
 
     fun stop() {
-        power = 0.0
-    }
-
-    fun updateServos() {
-        leftLift.power = power
-        rightLift.power = power
+        setPower(0.0)
     }
 }
