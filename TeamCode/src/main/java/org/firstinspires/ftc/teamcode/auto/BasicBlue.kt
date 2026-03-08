@@ -26,6 +26,7 @@ class BasicBlue : LinearOpMode() {
 
         fun setPipeline(index: Int) {
             robot.turret.limelight.pipelineSwitch(index)
+            robot.turret.limelight.start()
             sleep(700) // give pipeline more time to settle
         }
 
@@ -112,13 +113,13 @@ class BasicBlue : LinearOpMode() {
         // only enable auto-aim after confirming tag is actually visible
         robot.turret.aimTagId = 20
 
-        fun cw() = SequentialAction(robot.SpindexerRotate(+1), SleepAction(1.3))
-        fun ccw() = SequentialAction(robot.SpindexerRotate(-1), SleepAction(1.3))
+        fun cw() = SequentialAction(robot.SpindexerRotate(+1), SleepAction(1.5))
+        fun ccw() = SequentialAction(robot.SpindexerRotate(-1), SleepAction(1.5))
 
         fun makeLaunchAll() = RaceAction(
             robot.Update(),
             SequentialAction(
-                SleepAction(2.3),
+                SleepAction(3.0),
                 when (motifTag) {
                     22 -> SequentialAction(cw(), cw(), cw())
                     21 -> SequentialAction(ccw(), ccw(), cw(), cw(), cw())
@@ -174,7 +175,7 @@ class BasicBlue : LinearOpMode() {
             RaceAction(
                 robot.Update(),
                 drive.actionBuilder(endPose)
-                    .strafeTo(Vector2d(endPose.position.x, endPose.position.y - 11.0))
+                    .strafeTo(Vector2d(endPose.position.x, endPose.position.y - 20.0))
                     .build()
             )
         )
