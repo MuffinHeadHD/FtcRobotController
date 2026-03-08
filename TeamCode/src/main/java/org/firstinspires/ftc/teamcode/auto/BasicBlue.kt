@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import org.firstinspires.ftc.teamcode.AutonomousRobot
 import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive
 import kotlin.math.PI
+import kotlin.math.tan
 
 @Autonomous(name = "BasicBlueFar")
 class BasicBlue : LinearOpMode() {
@@ -95,6 +96,7 @@ class BasicBlue : LinearOpMode() {
             telemetry.addData("GoalTagSeen", seenGoal)
             telemetry.addData("Goal tx", goal?.targetXDegrees)
             telemetry.addData("Goal ty", goal?.targetYDegrees)
+            telemetry.addData("Limelight Distance", (robot.turret.tagHeightCm - robot.turret.camHeightCm) / tan(robot.turret.limelight.getLatestResult().fiducialResults[0].targetYDegrees))
             telemetry.addData("SeenGoalStable", seenGoalStable)
             telemetry.update()
 

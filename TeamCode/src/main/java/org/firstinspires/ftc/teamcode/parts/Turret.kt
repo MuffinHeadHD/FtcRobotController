@@ -31,8 +31,8 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
     private val maxPower_tt = 1.0
 
     private val camMountDeg = 20.0
-    private val tagHeightCm = 74.93
-    private val camHeightCm = 36.02493
+    val tagHeightCm = 74.93
+    val camHeightCm = 36.02493
     private var distFiltCm = 0.0
     private val distAlpha = 0.25
     private var lastDistSeenMs = System.currentTimeMillis()
