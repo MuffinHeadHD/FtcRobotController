@@ -20,4 +20,9 @@ class Lift(val leftLift: CRServo, val rightLift: CRServo) {
     fun stop() {
         power = 0.0
     }
+
+    fun updateServos() {
+        leftLift.power = power
+        rightLift.power = power
+    }
 }
