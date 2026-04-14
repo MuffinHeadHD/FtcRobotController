@@ -25,7 +25,7 @@ class TurretConfig {
         @JvmField
         var spikeVelIncrease = 500// spike increase in ticks/sec
         @JvmField
-        var spikeDurationMs = 500L // time 1000 = 1 sec
+        var spikeDurationMs = 250L // time 1000 = 1 sec
         @JvmField
         var spikeTriggerVolts = 0.20 // idk what this even means anymore, I'm just guessing and hoping it works
 
@@ -86,16 +86,15 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
     private val homeTol = 20
 
 
+    // ---------------------------------------------------------------------
+    private var spiking = false
+    private var spikeStartTime = 0L
 
-        // ---------------------------------------------------------------------
-        private var spiking = false
-        private var spikeStartTime = 0L
+    var dashboard: FtcDashboard = FtcDashboard.getInstance()
 
-        var dashboard: FtcDashboard = FtcDashboard.getInstance()
+    var dashboardTelemetry: Telemetry = dashboard.telemetry
 
-        var dashboardTelemetry: Telemetry = dashboard.telemetry
-
-        // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
 
     var lastTime = System.nanoTime()
@@ -125,7 +124,7 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
         val result = limelight.getLatestResult()
 
         var launchDistVolts = launchDist.getVoltage()
-        var distInLauncher = ((launchDistVolts /MaxVoltage) * MaxDistance_mm)
+        var distInLauncher = ((launchDistVolts / MaxVoltage) * MaxDistance_mm)
 
         var hasTargetNow = false
         var txDeg = 0.0
@@ -191,7 +190,7 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
                 } else {
                     var pwr = kP_tt * txToUse - kD_tt * txVel
                     if (abs(pwr) < minPower) pwr = 0.0
-                    clamp(pwr,-maxPower_tt, maxPower_tt)
+                    clamp(pwr, -maxPower_tt, maxPower_tt)
                 }
 
             turretMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
@@ -219,7 +218,7 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
         val distPts = doubleArrayOf(80.0, 120.0, 160.0, 180.0, 200.0, 320.0)
         val velPts = doubleArrayOf(1690.0, 1870.6459, 1902.0, 2022.901, 2106.0, 2420.0)
 
-    /*
+        /*
      if (distFresh) {
             val v = interp1D(distFiltCm, distPts, velPts)
             targetVelCmd = v.coerceIn(minVel, maxVel)
@@ -227,84 +226,78 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
 
      */
 
-
-
-        // ---------------------------------------------------------------------
-
-
-
         if (distFresh) {
-                val v = interp1D(distFiltCm, distPts, velPts)
+            val v = interp1D(distFiltCm, distPts, velPts)
 
 
-                if ((launchDistVolts < TurretConfig.spikeTriggerVolts) && !spiking && spindexer.wasRecentlyRotated()) {
-                    spiking = true
-                    spikeStartTime = System.currentTimeMillis()
-                }
-
-                targetVelCmd = if (spiking) {
-                    (v + TurretConfig.spikeVelIncrease).coerceIn(minVel, maxVel)
+            if ((launchDistVolts < TurretConfig.spikeTriggerVolts) && !spiking && spindexer.wasRecentlyRotated()) {
+                spiking = true
+                spikeStartTime = System.currentTimeMillis()
+            }
+            if (spiking) {
+                val elapsed = System.currentTimeMillis() - spikeStartTime
+                if (elapsed >= TurretConfig.spikeDurationMs) {
+                    spiking = false
+                    targetVelCmd = v.coerceIn(minVel, maxVel)
                 } else {
-                    v.coerceIn(minVel, maxVel)
+                    targetVelCmd = (v + TurretConfig.spikeVelIncrease).coerceIn(minVel, maxVel)
                 }
             }
-
-
-        if (spiking) {
-            val elapsed = System.currentTimeMillis() - spikeStartTime
-            if (elapsed >= TurretConfig.spikeDurationMs) {
-                spiking = false
-            }
         }
 
 
-        dashboardTelemetry.addData("dist volts", launchDistVolts)
-        dashboardTelemetry.addData("Spiking", spiking)
-        dashboardTelemetry.addData("Distance of Sensor in launcher", distInLauncher)
-        dashboardTelemetry.addData("recentRotate", spindexer.wasRecentlyRotated())
-        dashboardTelemetry.addData("lastRotateMs", spindexer.lastRotateTimeMs)
-        dashboardTelemetry.update()
+            // ---------------------------------------------------------------------
 
-        // ---------------------------------------------------------------------
 
-        targetVel = slew(targetVel, targetVelCmd, dt, velSlew)
-        val measuredVel = abs(flywheelMotor.velocity)
-        val ff = (targetVel / maxVelEst).coerceIn(0.0, 1.0)
-        val err = targetVel - measuredVel
-        val corr = kP_vel * err
-        val out = (ff + corr + TurretConfig.FlywheelLowVoltageAdditive).coerceIn(0.0, 1.0)
+            dashboardTelemetry.addData("dist volts", launchDistVolts)
+            dashboardTelemetry.addData("Spiking", spiking)
+            dashboardTelemetry.addData("Distance of Sensor in launcher", distInLauncher)
+            dashboardTelemetry.addData("recentRotate", spindexer.wasRecentlyRotated())
+            dashboardTelemetry.addData("lastRotateMs", spindexer.lastRotateTimeMs)
+            dashboardTelemetry.update()
 
-        val RED = 0.28
-        val YELLOW = 0.34
-        val GREEN = 0.50
-        val REDOVER = 0.28
+            // ---------------------------------------------------------------------
 
-        val error = targetVel - measuredVel
+            targetVel = slew(targetVel, targetVelCmd, dt, velSlew)
+            val measuredVel = abs(flywheelMotor.velocity)
+            val ff = (targetVel / maxVelEst).coerceIn(0.0, 1.0)
+            val err = targetVel - measuredVel
+            val corr = kP_vel * err
+            val out = (ff + corr + TurretConfig.FlywheelLowVoltageAdditive).coerceIn(0.0, 1.0)
 
-        val greenThreshold = 600.0  //green
-        val yellowThreshold = 1450.0  //yellow
-        val blinkThreshold = 2850.0   // red blink
+            val RED = 0.28
+            val YELLOW = 0.34
+            val GREEN = 0.50
+            val REDOVER = 0.28
 
-        val blinkPeriod = 500L //.5 sec
-        val blinkOn = (System.currentTimeMillis() / blinkPeriod) % 2 == 0L
+            val error = targetVel - measuredVel
 
-        val colorPos = when {
+            val greenThreshold = 600.0  //green
+            val yellowThreshold = 1450.0  //yellow
+            val blinkThreshold = 2850.0   // red blink
 
-            measuredVel + 500.0 > targetVel -> {
-                if (blinkOn) REDOVER else 0.0
+            val blinkPeriod = 500L //.5 sec
+            val blinkOn = (System.currentTimeMillis() / blinkPeriod) % 2 == 0L
+
+            val colorPos = when {
+
+                measuredVel + 500.0 > targetVel -> {
+                    if (blinkOn) REDOVER else 0.0
+                }
+
+                error > blinkThreshold -> {
+                    if (blinkOn) RED else 0.0
+                }
+
+                error > yellowThreshold -> RED
+                error > greenThreshold -> YELLOW
+                else -> GREEN
             }
-            error > blinkThreshold -> {
-                if (blinkOn) RED else 0.0
-            }
-            error > yellowThreshold -> RED
-            error > greenThreshold -> YELLOW
-            else -> GREEN
+
+            backlightR.setPosition(colorPos)
+            backlightL.setPosition(colorPos)                                                                                                                                                                                                                                                                                                                                                      //chicken
+
+            flyPower = rampTowards(flyPower, out, powerSlewPerSec * dt)
+            flywheelMotor.power = -flyPower
         }
-
-        backlightR.setPosition(colorPos)
-        backlightL.setPosition(colorPos)                                                                                                                                                                                                                                                                                                                                                      //chicken
-
-        flyPower = rampTowards(flyPower, out, powerSlewPerSec * dt)
-        flywheelMotor.power = -flyPower
     }
-}

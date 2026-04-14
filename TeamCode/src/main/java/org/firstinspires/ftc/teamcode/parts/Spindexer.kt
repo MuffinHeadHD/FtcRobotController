@@ -29,7 +29,7 @@ class SpindexerPID {
         @JvmField
         var kv = 0.0
         @JvmField
-        var lastSpinTime = 5000L
+        var lastSpinTime = 500L
     }
 }
 
