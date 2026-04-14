@@ -26,14 +26,14 @@ class TurretConfig {
         var flywheelVelocityDelta = 0.0
 
         @JvmField
-        var spikeVelIncrease = 128000 // spike ticks/sec
+        var spikeVelIncrease = 500// spike increase in ticks/sec
         @JvmField
         var spikeDurationMs = 500L // time 1000 = 1 sec
         @JvmField
-        var spikeTriggerCm = 5.0 // 5 cm
+        var spikeTriggerVolts = 0.20 // idk what this even means anymore, i'm just guessing and hoping it works
 
         @JvmField
-        var  FlywheelLowVoltageAdditive = 0.0 // this adds velocity when voltage is low (manually)
+        var  FlywheelLowVoltageAdditive  /* Power */ = 0.0 // this adds velocity when voltage is low (manually)
 
     }
 }
@@ -240,7 +240,7 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
                 val v = interp1D(distFiltCm, distPts, velPts)
 
 
-                if (distInLauncher < TurretConfig.spikeTriggerCm && !spiking && spindexer.wasRecentlyRotated()) {
+                if ((launchDistVolts < TurretConfig.spikeTriggerVolts) && !spiking && spindexer.wasRecentlyRotated()) {
                     spiking = true
                     spikeStartTime = System.currentTimeMillis()
                 }
