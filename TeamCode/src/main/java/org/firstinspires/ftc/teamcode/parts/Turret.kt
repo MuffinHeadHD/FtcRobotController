@@ -8,10 +8,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.Servo
-import com.qualcomm.robotcore.hardware.DigitalChannel
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.AutonomousRobot
-import org.firstinspires.ftc.teamcode.Robot
 import org.firstinspires.ftc.teamcode.clamp
 import org.firstinspires.ftc.teamcode.interp1D
 import org.firstinspires.ftc.teamcode.rampTowards
