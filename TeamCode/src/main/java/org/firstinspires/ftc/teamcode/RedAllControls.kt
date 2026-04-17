@@ -4,6 +4,7 @@ import android.graphics.Color
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.parts.IntakeMode
+import org.firstinspires.ftc.teamcode.parts.TurretConfig
 
 
 @TeleOp(name = "Red All Gamepad 1", group = "Decode")
@@ -44,6 +45,16 @@ class RedAllControls : LinearOpMode() {
                 robot.lift.down()
             } else {
                 robot.lift.stop()
+            }
+
+            if (robot.gamepadState2.dpad_up) {
+                TurretConfig.FlywheelLowVoltageAdditive = 0.05
+            } else if (robot.gamepadState2.dpad_down) {
+                TurretConfig.FlywheelLowVoltageAdditive = 0.1
+            } else if (robot.gamepadState2.dpad_left) {
+                TurretConfig.FlywheelLowVoltageAdditive = 0.2
+            } else if (robot.gamepadState2.dpad_right) {
+                TurretConfig.FlywheelLowVoltageAdditive = 0.0
             }
 
 
