@@ -32,12 +32,16 @@ class TurretConfig {
         @JvmField
         var  FlywheelLowVoltageAdditive  /* Power */ = 0.0 // this adds velocity when voltage is low (manually)
         @JvmField
-        var ManualSpikeBlock = false
+        var kD_tt = 0.0010 // 0.0005
+        @JvmField
+        var kP_tt = 0.014 // 0.009
+        @JvmField
+        var kI_tt = 0.000001 // 0.000001
 
     }
 }
 
-class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelMotor: DcMotorEx, val launchDist: AnalogInput, val backlightR: Servo, val backlightL: Servo, val spindexer: Spindexer) : Updatable {
+class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelMotor: DcMotorEx, val launchDist: AnalogInput, val backlightR: Servo, val backlightL: Servo, val spindexer: Spindexer, var shooting: Boolean = true) : Updatable {
 
     init {
         turretMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
@@ -51,13 +55,11 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
     private var lastSeenTimeMs = System.currentTimeMillis()
     private val holdLastSeenMs = 250L
 
-    private val deadbandDeg = 0.5
-    private val kP_tt = 0.014
+    private val deadbandDeg = 0.01
     private val minPower = 0.040
     private val maxPower_tt = 1.0
     private var lastTx = 0.0
     private var txVel = 0.0
-    private val kD_tt = 0.0010
 
     private val camMountDeg = 19.97
     val tagHeightCm = 74.93
@@ -86,6 +88,8 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
     private var homing = false
     private val homePower = 0.50
     private val homeTol = 20
+    private var turretIntegral = 0.0
+
 
 
     // ---------------------------------------------------------------------
@@ -100,6 +104,7 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
 
 
     var lastTime = System.nanoTime()
+
 
     fun startLimelight() {
         limelight.setPollRateHz(100)
@@ -116,6 +121,20 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
 
     fun home() {
         homeBiased(0)
+    }
+
+    fun homeLeft(offset: Int = -120) {
+        homing = true
+        turretMotor.targetPosition = offset
+        turretMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+        turretMotor.power = homePower
+    }
+
+    fun homeRight(offset: Int = 120) {
+        homing = true
+        turretMotor.targetPosition = offset
+        turretMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+        turretMotor.power = homePower
     }
 
     override fun update() {
@@ -169,6 +188,8 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
         val nowMs = System.currentTimeMillis()
         val recentlySeen = (nowMs - lastSeenTimeMs) <= holdLastSeenMs
 
+
+
         if (homing) {
             val errHome = turretMotor.targetPosition - turretMotor.currentPosition
             if (abs(errHome) <= homeTol) {
@@ -184,13 +205,24 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
                 recentlySeen -> lastTxDeg
                 else -> 0.0
             }
+
+
+            if (abs(txToUse) > deadbandDeg) {
+                turretIntegral += txToUse * dt
+            } else {
+                turretIntegral = 0.0
+            }
+
+            turretIntegral = clamp(turretIntegral, -200.0, 200.0)
+
+
             txVel = (txToUse - lastTx) / dt
             lastTx = txToUse
             val turretCmdPower =
                 if (abs(txToUse) <= deadbandDeg) {
                     0.0
                 } else {
-                    var pwr = kP_tt * txToUse - kD_tt * txVel
+                    var pwr = TurretConfig.kP_tt * txToUse - TurretConfig.kD_tt * txVel + TurretConfig.kI_tt * turretIntegral
                     if (abs(pwr) < minPower) pwr = 0.0
                     clamp(pwr, -maxPower_tt, maxPower_tt)
                 }
@@ -232,7 +264,7 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
             val v = interp1D(distFiltCm, distPts, velPts)
 
 
-            if ((launchDistVolts < TurretConfig.spikeTriggerVolts) && !spiking && spindexer.wasRecentlyRotated() && TurretConfig.ManualSpikeBlock) {
+            if ((launchDistVolts < TurretConfig.spikeTriggerVolts) && !spiking && spindexer.wasRecentlyRotated()) {
                 spiking = true
                 spikeStartTime = System.currentTimeMillis()
             }
@@ -300,6 +332,12 @@ class Turret(val limelight: Limelight3A, val turretMotor: DcMotor, val flywheelM
             backlightL.setPosition(colorPos)                                                                                                                                                                                                                                                                                                                                                      //chicken
 
             flyPower = rampTowards(flyPower, out, powerSlewPerSec * dt)
+
+        if (shooting == true) {
             flywheelMotor.power = -flyPower
+        } else if (shooting == false) {
+            flywheelMotor.power = -0.4
+        }
+
         }
     }

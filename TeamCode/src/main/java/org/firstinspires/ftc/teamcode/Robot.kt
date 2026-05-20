@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode
 
+import android.graphics.Color
 import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.hardware.limelightvision.Limelight3A
@@ -48,13 +49,16 @@ open class Robot(val opMode: OpMode) {
     lateinit var flywheelMotor: DcMotorEx
     lateinit var intakeServo: CRServo
     lateinit var spindexerServo: AxonServo
-    lateinit var spindexerColor: ColorSensor
+    lateinit var spindexerColorRight: ColorSensor
+    lateinit var spindexerColorLeft: ColorSensor
+    lateinit var spindexerColorFront: ColorSensor
     lateinit var spindexerDistance: DistanceSensor
     lateinit var spindexerMagnet: TouchSensor
     lateinit var launchDist: AnalogInput
     lateinit var backlightR: Servo
     lateinit var backlightL: Servo
     lateinit var voltageSensor: VoltageSensor
+
 
     lateinit var turretMotor: DcMotor
     lateinit var limelight: Limelight3A
@@ -124,8 +128,10 @@ open class Robot(val opMode: OpMode) {
             hwMap.get(CRServo::class.java, "spdx"),
             hwMap.get(AnalogInput::class.java, "axen")
         )
-        spindexerColor = hwMap.get(ColorSensor::class.java, "css")
-        spindexerDistance = hwMap.get(DistanceSensor::class.java, "cs")
+        spindexerColorRight = hwMap.get(ColorSensor::class.java, "csRight")
+        spindexerColorFront = hwMap.get(ColorSensor::class.java, "csFront")
+        spindexerColorLeft = hwMap.get(ColorSensor::class.java, "csLeft")
+        spindexerDistance = hwMap.get(DistanceSensor::class.java, "csRight")
         spindexerMagnet = hwMap.get(TouchSensor::class.java, "mag")
 
         turretMotor = hwMap.get(DcMotor::class.java, "tt")
@@ -142,14 +148,8 @@ open class Robot(val opMode: OpMode) {
 
         drive = Drive(lf, lb, rf, rb)
         intake = Intake(intakeServo)
-        spindexer = Spindexer(
-            spindexerServo,
-            spindexerDistance,
-            spindexerColor,
-            spindexerLight,
-            spindexerMagnet
-        )
-        turret = Turret(limelight, turretMotor, flywheelMotor, launchDist, backlightR, backlightL, spindexer)
+        spindexer = Spindexer(spindexerServo,spindexerDistance,spindexerColorFront,spindexerColorLeft,spindexerColorRight, spindexerLight,spindexerMagnet,false,false, false, false)
+        turret = Turret(limelight, turretMotor, flywheelMotor, launchDist, backlightR, backlightL, spindexer, shooting = true)
 
         lift = Lift(hwMap.get(CRServo::class.java, "leftlift"), hwMap.get(CRServo::class.java, "rightlift"))
 
@@ -164,6 +164,7 @@ open class Robot(val opMode: OpMode) {
         var lastVoltage = 0.0
         var voltageDropPerMin = 0.0
         var lastVoltageTime = System.nanoTime()
+
     fun update() {
         updateables.forEach { it.update() }
 
@@ -179,12 +180,17 @@ open class Robot(val opMode: OpMode) {
 
         lastVoltage = voltage
 
+        if (spindexer.SpindexerShootingReady == true) {
+            turret.shooting = true
+        }
+
         dashboardTelemetry.addData("voltage", voltage)
         dashboardTelemetry.addData("Battery drain (volts per min)", voltageDropPerMin)
         dashboardTelemetry.addData("Flywheel Velocity", flywheelMotor.velocity)
         dashboardTelemetry.addData("Flywheel Goal", turret.flyPower)
         dashboardTelemetry.update()
     }
+
 
     fun updateGamepadStates(last: Boolean) {
         if (last) {

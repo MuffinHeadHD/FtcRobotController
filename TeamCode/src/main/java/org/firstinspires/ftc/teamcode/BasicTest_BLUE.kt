@@ -4,6 +4,7 @@ import android.graphics.Color
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.teamcode.parts.IntakeMode
+import org.firstinspires.ftc.teamcode.parts.TurretConfig
 
 @TeleOp(name = "Blue TeleOp", group = "Decode")
 class BasicTest_BLUE : LinearOpMode() {
@@ -45,12 +46,20 @@ class BasicTest_BLUE : LinearOpMode() {
                 robot.lift.stop()
             }
 
+            if (robot.gamepadState2.dpad_right) {
+                TurretConfig.FlywheelLowVoltageAdditive = TurretConfig.FlywheelLowVoltageAdditive+ 0.005
+            } else if (robot.gamepadState2.dpad_left) {
+                TurretConfig.FlywheelLowVoltageAdditive = TurretConfig.FlywheelLowVoltageAdditive - 0.005
+            } else if (robot.gamepadState2.x && robot.gamepadState2.a && robot.gamepadState2.b && robot.gamepadState2.y) {
+                TurretConfig.FlywheelLowVoltageAdditive = 0.0
+            }
+
 
             robot.dashboardTelemetry.addData("Lime Dist", robot.turret.limelight.latestResult.tx)
             robot.dashboardTelemetry.addData("Turret Power", robot.turret.turretMotor.power)
 
             val hsv = FloatArray(3)
-            Color.RGBToHSV(robot.spindexer.colorSensor.red(), robot.spindexer.colorSensor.green(), robot.spindexer.colorSensor.blue(), hsv)
+            Color.RGBToHSV(robot.spindexer.colorSensorRight.red(), robot.spindexer.colorSensorRight.green(), robot.spindexer.colorSensorRight.blue(), hsv)
             robot.dashboardTelemetry.addData("H", hsv[0])
             robot.dashboardTelemetry.addData("S", hsv[1])
             robot.dashboardTelemetry.addData("V", hsv[2])
