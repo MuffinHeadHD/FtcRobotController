@@ -38,35 +38,28 @@ class CameraController: LinearOpMode() {
             NONE
         }
 
-        fun startLimelight() {
-        limelight.setPollRateHz(100)
-        limelight.pipelineSwitch(PIPELINE_INDEX)
-        limelight.start()
-        }
 
 
     override fun runOpMode() {
 
-            startLimelight()
+            limelight = hardwareMap.get(Limelight3A::class.java, "limelight")
+            limelight.setPollRateHz(100)
             limelight.pipelineSwitch(0)
-
-            val hwMap: HardwareMap = opMode.hardwareMap
-
-            limelight = hwMap.get(Limelight3A::class.java, "limelight")
-            flywheel = hwMap.get(DcMotor::class.java, "flywheel")
-            intake = hwMap.get(CRServo::class.java, "intk")
-            spindexer = SpindexerCam(spindexerServo)
+            limelight.start()
+            flywheel = hardwareMap.get(DcMotor::class.java, "flywheel")
+            intake = hardwareMap.get(CRServo::class.java, "intk")
             spindexerServo = AxonServo(
-            hwMap.get(CRServo::class.java, "spdx"),
-            hwMap.get(AnalogInput::class.java, "axen")
+                hardwareMap.get(CRServo::class.java, "spdx"),
+                hardwareMap.get(AnalogInput::class.java, "axen")
             )
+            spindexer = SpindexerCam(spindexerServo)
 
 
 
             waitForStart()
 
             while (opModeIsActive()) {
-                
+
                 val color = detectColor()
 
                 val number = readTagNumber()
@@ -104,6 +97,12 @@ class CameraController: LinearOpMode() {
                 telemetry.update()
             }
         }
+
+    fun startLimelight() {
+        limelight.setPollRateHz(100)
+        limelight.pipelineSwitch(PIPELINE_INDEX)
+        limelight.start()
+    }
 
     fun FollowWhenRed() {
         val result = limelight.getLatestResult()
